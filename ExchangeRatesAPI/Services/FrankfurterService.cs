@@ -17,6 +17,7 @@ namespace ExchangeRatesAPI.Services
             _context = context;
         }
 
+        /*
         public async Task FetchAndStoreRates(string baseCurrency)
         {
             var response = await _httpClient.GetAsync($"https://api.frankfurter.app/latest?base={baseCurrency}");
@@ -42,7 +43,7 @@ namespace ExchangeRatesAPI.Services
             }
 
             await _context.SaveChangesAsync();
-        }
+        }*/
 
         public async Task<FrankfurterResponse> GetLatestRatesAsync()
         {

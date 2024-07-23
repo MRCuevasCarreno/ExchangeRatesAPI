@@ -1,12 +1,14 @@
 ﻿using ExchangeRatesAPI.Data;
 using ExchangeRatesAPI.Models;
 using ExchangeRatesAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace ExchangeRatesAPI.Controllers
 {
+    
     [ApiController]
     [Route("[controller]")]
     public class ExchangeRatesController : ControllerBase
@@ -45,14 +47,14 @@ namespace ExchangeRatesAPI.Controllers
             var historicalRates = await _frankfurterService.GetHistoricalRatesAsync(startDate, endDate);
             return Ok(historicalRates);
         }
-
+        /*
         [HttpPost("fetch")]
         public async Task<IActionResult> FetchAndStoreRates([FromQuery] string baseCurrency)
         {
             //Para cargar desde FrankFurter data TODO
             await _frankfurterService.FetchAndStoreRates(baseCurrency);
             return Ok("Rates fetched and stored successfully.");
-        }
+        }*/
 
         [HttpGet("rates/average")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]

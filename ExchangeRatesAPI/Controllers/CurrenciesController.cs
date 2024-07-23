@@ -1,10 +1,12 @@
 ﻿using ExchangeRatesAPI.Data;
 using ExchangeRatesAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExchangeRatesAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class CurrenciesController : ControllerBase
