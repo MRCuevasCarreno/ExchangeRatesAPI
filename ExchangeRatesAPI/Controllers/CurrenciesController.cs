@@ -18,6 +18,7 @@ namespace ExchangeRatesAPI.Controllers
             _context = context;
         }
 
+        //o	GET /rates: Devuelve la lista de tasas de cambio almacenadas. OK
         [HttpGet("/rates")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetCurrencies()
@@ -26,6 +27,7 @@ namespace ExchangeRatesAPI.Controllers
             return Ok(currencies);
         }
 
+        //o	GET /rates/{id}: Devuelve una tasa de cambio específica por Id. OK
         [HttpGet("/rates/{id}")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetCurrency(string id)
@@ -38,6 +40,7 @@ namespace ExchangeRatesAPI.Controllers
             return Ok(currency);
         }
 
+        //o	POST /rates: Crea nuevas tasas de cambio. OK
         [HttpPost("/rates")]
         public async Task<IActionResult> CreateCurrency([FromBody] Currency currency)
         {
@@ -46,6 +49,7 @@ namespace ExchangeRatesAPI.Controllers
             return CreatedAtAction(nameof(GetCurrency), new { id = currency.Id }, currency);
         }
 
+        //o	PUT /rates/{id}: Actualiza una tasa de cambio existente por Id. OKo	PUT /rates/{id}: Actualiza una tasa de cambio existente por Id. OK
         [HttpPut("/rates/{id}")]
         public async Task<IActionResult> UpdateCurrency(string id, [FromBody] Currency updatedCurrency)
         {
@@ -62,6 +66,7 @@ namespace ExchangeRatesAPI.Controllers
             return NoContent();
         }
 
+        //o	DELETE /rates/{id}: Elimina una tasa de cambio por Id. OK
         [HttpDelete("/rates/{id}")]
         public async Task<IActionResult> DeleteCurrency(string id)
         {

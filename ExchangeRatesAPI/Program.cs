@@ -17,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddHttpClient<FrankfurterService>();
 builder.Services.AddScoped<FrankfurterService>();
 
+//Implementar un sistema de autenticación utilizando Json Web Tokens (JWT) para proteger los endpoints CRUD. OK
 var key = Encoding.ASCII.GetBytes("ThisIsASecretKeyWith32Characters12345");
 builder.Services.AddAuthentication(options =>
 {
@@ -37,7 +38,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+//Configurar caché en memoria para mejorar el rendimiento de las solicitudes GET. OK
 builder.Services.AddMemoryCache();
 builder.Services.AddResponseCaching();
 builder.Services.AddCors(

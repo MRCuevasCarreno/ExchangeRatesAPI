@@ -67,6 +67,7 @@ namespace ExchangeRatesAPI.Services
             }
         }
 
+        //Implementar endpoints que permitan obtener tasas de cambio desde la API de Frankfurter y almacenarlas en la base de datos. OK
         public async Task<FrankfurterResponse> GetLatestRatesAsync()
         {
             var response = await _httpClient.GetAsync($"https://api.frankfurter.app/latest");
@@ -76,6 +77,7 @@ namespace ExchangeRatesAPI.Services
             return data;
         }
 
+        //Los endpoints deben ser capaces de manejar diferentes tipos de consultas (tasas de cambio más recientes, históricas, series temporales y conversiones). OK
         public async Task<FrankfurterResponse> GetHistoricalRateAsync(string date)
         {
             string newFormat = DateTime.ParseExact(date, "dd'-'MM'-'yyyy", CultureInfo.InvariantCulture).ToString("yyyy'-'MM'-'dd");
@@ -87,6 +89,7 @@ namespace ExchangeRatesAPI.Services
             return data;
         }
 
+        //Los endpoints deben ser capaces de manejar diferentes tipos de consultas (tasas de cambio más recientes, históricas, series temporales y conversiones). OK
         public async Task<FrankfurterHistoricalResponse> GetHistoricalRatesAsync(string startDate, string endDate)
         {
             string startDateFormat = DateTime.ParseExact(startDate, "dd'-'MM'-'yyyy", CultureInfo.InvariantCulture).ToString("yyyy'-'MM'-'dd");
