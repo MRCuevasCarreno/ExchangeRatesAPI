@@ -77,7 +77,4 @@ API Host: https://api.frankfurter.app
 ## Como lanzar
 
 * Abrir la solución Visual Studio 2017
-* Run the application.
-
-## Postman Collection
-* https://app.getpostman.com/join-team?invite_code=63bbf41b2aeab124fe9c257215541130&target_code=3911bb4c6915513e9567eae457950831
+* Correr la aplicación.
