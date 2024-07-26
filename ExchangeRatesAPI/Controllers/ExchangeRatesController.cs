@@ -64,7 +64,7 @@ namespace ExchangeRatesAPI.Controllers
         }
 
         //o	GET /rates/currency/{baseCurrency}: Devuelve las tasas de cambio por moneda base. OK
-        [HttpGet("/rates/currency/targetCurrencyByBaseCurrency{baseCurrency}")]
+        [HttpGet("/rates/currency/targetCurrencyByBaseCurrency/{baseCurrency}")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
         public async Task<List<ExchangeRate>> GetAverageRate(string baseCurrency)
         {
@@ -73,7 +73,20 @@ namespace ExchangeRatesAPI.Controllers
                 .OrderBy(a => a.BaseCurrency)
                 .ToListAsync();
         }
+        //o	DELETE /rates/currency/{baseCurrency}: Elimina las tasas de cambio por moneda base. OK
+        [HttpDelete("/rates/currency/{baseCurrency}")]
+        public async Task<IActionResult> DeleteBaseCurrency(string baseCurrency)
+        {
+            var targetCurrency = await _context.ExchangeRates.Where(x => x.BaseCurrency == baseCurrency).ToListAsync();
+            if (!targetCurrency.Any())
+            {
+                return NotFound();
+            }
 
+            _context.ExchangeRates.RemoveRange(targetCurrency);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
         //o	GET /rates/average?base={baseCurrency}&target={targetCurrency}&start={startDate}&end={endDate}: Devuelve el valor promedio de la tasa de cambio entre las fechas especificadas. NOK
         [HttpGet("rates/average")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
