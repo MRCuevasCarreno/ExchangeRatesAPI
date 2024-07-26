@@ -75,19 +75,6 @@ namespace ExchangeRatesAPI.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        [HttpGet("/rates/currency/{name}")]
-        [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
-        public async Task<IActionResult> GetCurrencyByName(string name)
-        {
-            var currency = await _context.Currencies
-                                         .FirstOrDefaultAsync(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (currency == null)
-            {
-                return NotFound();
-            }
-            return Ok(currency);
-        }
     }
 
 }

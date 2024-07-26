@@ -55,7 +55,18 @@ namespace ExchangeRatesAPI.Controllers
             return Ok("Rates fetched and stored successfully.");
         }
 
-        [HttpGet("rates/average")]
+        //Devuelve las tasas de cambio por moneda base
+        [HttpGet("/rates/currency/targetCurrencyByBaseCurrency{baseCurrency}")]
+        [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
+        public async Task<List<ExchangeRate>> GetAverageRate(string baseCurrency)
+        {
+            return await _context.ExchangeRates
+                .Where(a => a.BaseCurrency == baseCurrency)
+                .OrderBy(a => a.BaseCurrency)
+                .ToListAsync();
+        }
+
+            [HttpGet("rates/average")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetAverageRate(string baseCurrency, string targetCurrency, DateTime start, DateTime end)
         {
