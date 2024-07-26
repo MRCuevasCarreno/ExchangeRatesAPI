@@ -47,14 +47,13 @@ namespace ExchangeRatesAPI.Controllers
             var historicalRates = await _frankfurterService.GetHistoricalRatesAsync(startDate, endDate);
             return Ok(historicalRates);
         }
-        /*
-        [HttpPost("fetch")]
+
+        [HttpPost("loadRates")]
         public async Task<IActionResult> FetchAndStoreRates([FromQuery] string baseCurrency)
         {
-            //Para cargar desde FrankFurter data TODO
             await _frankfurterService.FetchAndStoreRates(baseCurrency);
             return Ok("Rates fetched and stored successfully.");
-        }*/
+        }
 
         [HttpGet("rates/average")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]

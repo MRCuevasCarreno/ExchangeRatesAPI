@@ -2,6 +2,8 @@
 using ExchangeRatesAPI.Models;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json;
+
 
 
 namespace ExchangeRatesAPI.Services
@@ -17,33 +19,52 @@ namespace ExchangeRatesAPI.Services
             _context = context;
         }
 
-        /*
+
         public async Task FetchAndStoreRates(string baseCurrency)
+{
+    var response = await _httpClient.GetStringAsync($"https://api.frankfurter.app/latest?base={baseCurrency}");
+    var data = JsonConvert.DeserializeObject<FrankfurterResponse>(response);
+
+    if (data != null && data.Rates != null)
+    {
+        // Asegúrate de que la moneda base existe en la tabla Currencies
+        if (!_context.Currencies.Any(c => c.Id == baseCurrency))
         {
-            var response = await _httpClient.GetAsync($"https://api.frankfurter.app/latest?base={baseCurrency}");
-            Console.WriteLine("endpoint scoped https://api.frankfurter.app/latest?base=" + baseCurrency);
-            response.EnsureSuccessStatusCode();
-            var apiResponse = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("apiResponse: " + apiResponse);
-            var data = JsonConvert.DeserializeObject<FrankfurterResponse>(apiResponse);
-            Console.WriteLine("data: " + data);
-            Console.WriteLine("data.Base: " + data.Base);
-            Console.WriteLine("data.Date: " + data.Date);
-            foreach (var rate in data.Rates)
+            _context.Currencies.Add(new Currency
             {
-                var exchangeRate = new ExchangeRate
+                Id = baseCurrency,
+                Symbol = baseCurrency,
+                Name = baseCurrency // Puedes reemplazar esto con el nombre real de la moneda si lo tienes
+            });
+        }
+
+        foreach (var rate in data.Rates)
+        {
+            // Asegúrate de que las monedas objetivo existen en la tabla Currencies
+            if (!_context.Currencies.Any(c => c.Id == rate.Key))
+            {
+                _context.Currencies.Add(new Currency
                 {
-                    
-                    BaseCurrency = data.Base,
-                    TargetCurrency = data.Rates,
-                    Rate = rate.Value,
-                    Date = DateTime.Parse(data.Date)
-                };
-                _context.ExchangeRates.Add(exchangeRate);
+                    Id = rate.Key,
+                    Symbol = rate.Key,
+                    Name = rate.Key // Puedes reemplazar esto con el nombre real de la moneda si lo tienes
+                });
             }
 
-            await _context.SaveChangesAsync();
-        }*/
+            var exchangeRate = new ExchangeRate
+            {
+                BaseCurrency = baseCurrency,
+                TargetCurrency = rate.Key,
+                Rate = rate.Value,
+                Date = DateTime.Parse(data.Date)
+            };
+
+            _context.ExchangeRates.Add(exchangeRate);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+}
 
         public async Task<FrankfurterResponse> GetLatestRatesAsync()
         {
