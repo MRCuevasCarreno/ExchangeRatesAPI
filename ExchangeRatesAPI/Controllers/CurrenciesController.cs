@@ -44,8 +44,22 @@ namespace ExchangeRatesAPI.Controllers
         [HttpPost("/rates")]
         public async Task<IActionResult> CreateCurrency([FromBody] Currency currency)
         {
+            if (currency == null)
+            {
+                return BadRequest("Currency is null.");
+            }
+
+            var existingCurrency = await _context.Currencies
+                .FirstOrDefaultAsync(c => c.Id == currency.Id);
+
+            if (existingCurrency != null)
+            {
+                return Conflict("Currency already exists.");
+            }
+
             _context.Currencies.Add(currency);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetCurrency), new { id = currency.Id }, currency);
         }
 

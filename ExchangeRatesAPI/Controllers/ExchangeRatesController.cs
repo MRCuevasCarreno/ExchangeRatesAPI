@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Globalization;
 
 namespace ExchangeRatesAPI.Controllers
 {
-    
+
     [ApiController]
     [Route("[controller]")]
     public class ExchangeRatesController : ControllerBase
@@ -60,21 +61,74 @@ namespace ExchangeRatesAPI.Controllers
             }
 
             await _frankfurterService.FetchAndStoreRates(baseCurrency);
-            return Ok("Rentabilidad de Moneda Actualizada.");
+            return Ok("Profitability Updated.");
         }
 
         //o	GET /rates/currency/{baseCurrency}: Devuelve las tasas de cambio por moneda base. OK
         [HttpGet("/rates/currency/targetCurrencyByBaseCurrency/{baseCurrency}")]
         [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
-        public async Task<List<ExchangeRate>> GetAverageRate(string baseCurrency)
+        public async Task<IActionResult> GetAverageRate(string baseCurrency)
         {
-            return await _context.ExchangeRates
+            var exchangeRates = await _context.ExchangeRates
                 .Where(a => a.BaseCurrency == baseCurrency)
                 .OrderBy(a => a.BaseCurrency)
                 .ToListAsync();
+
+            var result = exchangeRates.Select(rate => new
+            {
+                Id = rate.Id,
+                BaseCurrency = rate.BaseCurrency,
+                TargetCurrency = rate.TargetCurrency,
+                Rate = rate.Rate,
+                Date = rate.Date.ToString("dd/MM/yyyy")
+            }).ToList();
+
+            return Ok(result);
         }
-        //o	DELETE /rates/currency/{baseCurrency}: Elimina las tasas de cambio por moneda base. OK
-        [HttpDelete("/rates/currency/{baseCurrency}")]
+
+        //Actualiza las tasas de cambio por moneda base (requiere pasar un body con los datos a actualizar). NOK
+        [HttpPut("/rates/currency")]
+        public async Task<IActionResult> UpdateBaseCurrency([FromBody] List<ExchangeRate> exchangeRates)
+        {
+            if (exchangeRates == null || !exchangeRates.Any())
+            {
+                return BadRequest("No exchange rates provided.");
+            }
+
+            foreach (var exchangeRate in exchangeRates)
+            {
+                var existingRate = await _context.ExchangeRates
+                    .FirstOrDefaultAsync(er => er.Id == exchangeRate.Id);
+
+                if (existingRate == null)
+                {
+                    return NotFound($"Exchange rate with ID {exchangeRate.Id} not found.");
+                }
+
+                existingRate.BaseCurrency = exchangeRate.BaseCurrency;
+                existingRate.TargetCurrency = exchangeRate.TargetCurrency;
+                existingRate.Rate = exchangeRate.Rate;
+                existingRate.Date = exchangeRate.Date;
+
+                _context.ExchangeRates.Update(existingRate);
+            }
+
+            await _context.SaveChangesAsync();
+
+            var result = exchangeRates.Select(rate => new
+            {
+                Id = rate.Id,
+                BaseCurrency = rate.BaseCurrency,
+                TargetCurrency = rate.TargetCurrency,
+                Rate = rate.Rate,
+                Date = rate.Date.ToString("dd-MM-yyyy") // Formato de la fecha
+            }).ToList();
+
+            return Ok(result);
+        }
+
+    //o	DELETE /rates/currency/{baseCurrency}: Elimina las tasas de cambio por moneda base. OK
+    [HttpDelete("/rates/currency/{baseCurrency}")]
         public async Task<IActionResult> DeleteBaseCurrency(string baseCurrency)
         {
             var targetCurrency = await _context.ExchangeRates.Where(x => x.BaseCurrency == baseCurrency).ToListAsync();
@@ -86,44 +140,6 @@ namespace ExchangeRatesAPI.Controllers
             _context.ExchangeRates.RemoveRange(targetCurrency);
             await _context.SaveChangesAsync();
             return NoContent();
-        }
-        //o	GET /rates/average?base={baseCurrency}&target={targetCurrency}&start={startDate}&end={endDate}: Devuelve el valor promedio de la tasa de cambio entre las fechas especificadas. NOK
-        [HttpGet("rates/average")]
-        [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
-        public async Task<IActionResult> GetAverageRate(string baseCurrency, string targetCurrency, DateTime start, DateTime end)
-        {
-            //TODO
-            var rates = await _context.ExchangeRates
-                .Where(r => r.BaseCurrency == baseCurrency && r.TargetCurrency == targetCurrency && r.Date >= start && r.Date <= end)
-                .ToListAsync();
-
-            if (!rates.Any())
-            {
-                return NotFound();
-            }
-
-            var averageRate = rates.Average(r => r.Rate);
-            return Ok(averageRate);
-        }
-
-        //o	GET /rates/minmax?base={baseCurrency}&target={targetCurrency}&start={startDate}&end={endDate}: Devuelve los valores mínimo y máximo de la tasa de cambio entre las fechas especificadas. NOK
-        [HttpGet("rates/minmax")]
-        [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Client)]
-        public async Task<IActionResult> GetMinMaxRate(string baseCurrency, string targetCurrency, DateTime start, DateTime end)
-        {
-            //TODO
-            var rates = await _context.ExchangeRates
-                .Where(r => r.BaseCurrency == baseCurrency && r.TargetCurrency == targetCurrency && r.Date >= start && r.Date <= end)
-                .ToListAsync();
-
-            if (!rates.Any())
-            {
-                return NotFound();
-            }
-
-            var minRate = rates.Min(r => r.Rate);
-            var maxRate = rates.Max(r => r.Rate);
-            return Ok(new { MinRate = minRate, MaxRate = maxRate });
         }
     }
 }
