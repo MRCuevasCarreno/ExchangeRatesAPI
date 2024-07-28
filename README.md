@@ -77,3 +77,4 @@ API Host: https://api.frankfurter.app
 
 * Abrir la solución Visual Studio 2017
 * Correr la aplicación.
+* Utilizar el Swagger.
