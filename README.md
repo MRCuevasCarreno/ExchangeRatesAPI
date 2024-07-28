@@ -4,8 +4,7 @@ Seguimiento del proyecto se encuentra en https://github.com/MRCuevasCarreno/Exch
 
 # ASP.NET Core 8 & EntityFramework Core 8
 
-This template is a simple startup project to start with ABP
-using ASP.NET Core and EntityFramework Core.
+Proyecto .NET Core 8 de curso realizado en Socius Chile.
 
 ## Requerimiento
 
