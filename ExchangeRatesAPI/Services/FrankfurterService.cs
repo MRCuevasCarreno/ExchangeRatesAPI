@@ -28,14 +28,12 @@ namespace ExchangeRatesAPI.Services
 
             if (data != null && data.Rates != null)
             {
-                // Asegúrate de que la moneda base existe en la tabla Currencies
                 if (!_context.Currencies.Any(c => c.Id == baseCurrency))
                 {
                     _context.Currencies.Add(new Currency
                     {
                         Id = baseCurrency,
                         Symbol = baseCurrency,
-                        Name = baseCurrency // Puedes reemplazar esto con el nombre real de la moneda si lo tienes
                     });
                 }
 
@@ -48,7 +46,7 @@ namespace ExchangeRatesAPI.Services
                         {
                             Id = rate.Key,
                             Symbol = rate.Key,
-                            Name = rate.Key // Puedes reemplazar esto con el nombre real de la moneda si lo tienes
+                            Name = rate.Key 
                         });
                     }
 
